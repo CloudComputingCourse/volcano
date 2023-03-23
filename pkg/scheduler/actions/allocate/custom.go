@@ -1,7 +1,7 @@
 package allocate
 
 import (
-	"github.com/kubernetes-sigs/kube-batch/pkg/scheduler/api"
+	"volcano.sh/volcano/pkg/scheduler/api"
 )
 
 func customFn(jobs []*api.JobInfo, nodes []*api.NodeInfo) map[*api.TaskInfo]*api.NodeInfo {
