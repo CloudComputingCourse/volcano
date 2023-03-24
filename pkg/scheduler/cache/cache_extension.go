@@ -21,7 +21,7 @@ func (sc *SchedulerCache) UpdateScheduledTime(task *volapi.TaskInfo) error {
 	retryTimes := 5
 	scheduledTime := metav1.NewTime(time.Now())
 	for i :=0; i < retryTimes; i++ {
-		pod, err := sc.kubeclient.CoreV1().Pods(task.Pod.Namespace).Get(task.Pod.Name, metav1.GetOptions{})
+		pod, err := sc.kubeClient.CoreV1().Pods(task.Pod.Namespace).Get(task.Pod.Name, metav1.GetOptions{})
 		if err != nil {
 			if apierrors.IsNotFound(err) {
 				return nil
@@ -34,7 +34,7 @@ func (sc *SchedulerCache) UpdateScheduledTime(task *volapi.TaskInfo) error {
 		}
 		pod.ObjectMeta.Annotations["scheduledTime"] = scheduledTime.Rfc3339Copy().String()
 
-		pod, err = sc.kubeclient.CoreV1().Pods(pod.Namespace).Update(pod)
+		pod, err = sc.kubeClient.CoreV1().Pods(pod.Namespace).Update(pod)
 		if err == nil {
 			return nil
 		}
@@ -56,7 +56,7 @@ func (sc *SchedulerCache) LoadSchedulerConf(path string) (map[string]string, err
 		return nil, err
 	}
 
-	confMap, err := sc.kubeclient.CoreV1().ConfigMaps(ns).Get(name, metav1.GetOptions{})
+	confMap, err := sc.kubeClient.CoreV1().ConfigMaps(ns).Get(name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
