@@ -87,6 +87,10 @@ type Cache interface {
 
 	// EventRecorder returns the event recorder
 	EventRecorder() record.EventRecorder
+
+	// cmu719 p3k8s specific functions
+	LoadSchedulerConf(path string) (map[string]string, error)
+	UpdateScheduledTime(task *api.TaskInfo) error
 }
 
 // VolumeBinder interface for allocate and bind volumes
