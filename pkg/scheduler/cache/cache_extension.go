@@ -42,7 +42,7 @@ func (sc *SchedulerCache) UpdateScheduledTime(task *volapi.TaskInfo) error {
 			if apierrors.IsNotFound(err) {
 				return nil
 			}
-			glog.Errorf("falied to update pod scheduled time: %v", err)
+			klog.Errorf("falied to update pod scheduled time: %v", err)
 			return err
 		}
 		time.Sleep(updateInterval)
