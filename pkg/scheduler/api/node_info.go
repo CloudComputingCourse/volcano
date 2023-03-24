@@ -85,6 +85,11 @@ type NodeInfo struct {
 	// checking an image's existence and advanced usage (e.g., image locality scheduling policy) based on the image
 	// state information.
 	ImageStates map[string]*k8sframework.ImageStateSummary
+
+	// CMU719 p3 custom properties
+	ID int
+	Rack int
+	GPU bool
 }
 
 // FutureIdle returns resources that will be idle in the future:
