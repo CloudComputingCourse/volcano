@@ -150,7 +150,7 @@ func (alloc *Action) Execute(ssn *framework.Session) {
 				continue
 			}
 			nodes = append(nodes, node)
-			if t.Resreq.LessEqual(node.Idle) {
+			if t.Resreq.LessEqual(node.Idle, api.Zero) {
 				nodesAvailable[node.Node.ObjectMeta.Name] = node
 			}
 		}
@@ -212,7 +212,7 @@ func (alloc *Action) Execute(ssn *framework.Session) {
 							task.Namespace, task.Name, node.Name)
 						break
 					}
-					if !task.Resreq.LessEqual(node.Idle) {
+					if !task.Resreq.LessEqual(node.Idle, api.Zero) {
 						validAllocation = false
 						klog.Errorf("ERROR! Could not allocate Task <%v/%v>: node enough idle resources in Node %v",
 							task.Namespace, task.Name, node.Name)
