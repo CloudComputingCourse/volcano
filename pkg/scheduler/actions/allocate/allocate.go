@@ -17,15 +17,15 @@
 package allocate
 
 import (
-	"time"
+	//"time"
 
 	"k8s.io/klog/v2"
 
-	"volcano.sh/apis/pkg/apis/scheduling"
+	//"volcano.sh/apis/pkg/apis/scheduling"
 	"volcano.sh/volcano/pkg/scheduler/api"
-	"volcano.sh/volcano/pkg/scheduler/conf"
+	//"volcano.sh/volcano/pkg/scheduler/conf"
 	"volcano.sh/volcano/pkg/scheduler/framework"
-	"volcano.sh/volcano/pkg/scheduler/metrics"
+	//"volcano.sh/volcano/pkg/scheduler/metrics"
 	"volcano.sh/volcano/pkg/scheduler/util"
 
 	// packages needed to make p3k8s work
@@ -261,7 +261,7 @@ func (alloc *Action) Execute(ssn *framework.Session) {
 			for task, node := range allocation {
 				klog.V(3).Infof("Try to bind Task <%v/%v> to Node <%v>: <%v> vs. <%v>",
 					task.Namespace, task.Name, node.Name, task.Resreq, node.Idle)
-				if err := ssn.Allocate(task, node.Name); err != nil {
+				if err := ssn.Allocate(task, node); err != nil {
 					klog.Errorf("ERROR! Failed to bind Task %v on %v in Session %v",
 						task.UID, node.Name, ssn.UID)
 				} else {
