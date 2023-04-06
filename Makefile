@@ -87,14 +87,9 @@ vcctl: init
 image_bins: vc-scheduler vc-controller-manager vc-webhook-manager
 
 images:
-<<<<<<< Updated upstream
 	for name in scheduler; do\
-		docker buildx build -t "${IMAGE_PREFIX}/vc-sail-$$name:$(TAG)" . -f ./installer/dockerfile/$$name/Dockerfile --output=type=${BUILDX_OUTPUT_TYPE} --platform ${DOCKER_PLATFORMS}; \
-=======
-	for name in controller-manager scheduler webhook-manager; do\
-		docker buildx build -t "${IMAGE_PREFIX}/vc-$$name:latest" . -f ./installer/dockerfile/$$name/Dockerfile --output=type=${BUILDX_OUTPUT_TYPE} --platform ${DOCKER_PLATFORMS}; \
-		docker push "${IMAGE_PREFIX}/vc-$$name:latest"; \
->>>>>>> Stashed changes
+		docker buildx build -t "${IMAGE_PREFIX}/vc-sail-$$name:8946e83763e2f8a50090509ced877071072422b7" . -f ./installer/dockerfile/$$name/Dockerfile --output=type=${BUILDX_OUTPUT_TYPE} --platform ${DOCKER_PLATFORMS}; \
+		minikube image push "${IMAGE_PREFIX}/vc-sail-$$name:8946e83763e2f8a50090509ced877071072422b7"; \
 	done
 
 generate-code:

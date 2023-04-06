@@ -119,7 +119,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Release.Name }}-scheduler
-          image: sailimages/vc-sail-scheduler:8946e83763e2f8a50090509ced877071072423b7
+          image: sailimages/vc-sail-scheduler:8946e83763e2f8a50090509ced877071072422b7
           args:
             - --logtostderr
             - --scheduler-conf=/volcano.scheduler/{{base .Values.basic.scheduler_config_file}}
