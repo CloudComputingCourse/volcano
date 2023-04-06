@@ -368,10 +368,10 @@ func (r *Resource) LessEqual(rr *Resource, defaultValue DimensionDefaultValue) b
 		}
 		return false
 	}
-
 	if !lessEqualFunc(r.MilliCPU, rr.MilliCPU, minResource) {
 		return false
 	}
+
 	if !lessEqualFunc(r.Memory, rr.Memory, minResource) {
 		return false
 	}

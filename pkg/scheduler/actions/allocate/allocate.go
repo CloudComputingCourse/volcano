@@ -83,7 +83,8 @@ func (alloc *Action) Initialize() {}
 
 func (alloc *Action) Execute(ssn *framework.Session) {
 	klog.V(3).Infof("Enter Allocate ...")
-	defer klog.V(3).Infof("Leaving Allocate ...")
+	klog.V(3).Infof("This is a custom log that I wrote to check ...")
+        defer klog.V(3).Infof("Leaving Allocate ...")
 
 	// Load configuration of policy
 	policyConf := ssn.GetPolicy("kube-system/scheduler-conf")
@@ -144,12 +145,19 @@ func (alloc *Action) Execute(ssn *framework.Session) {
 	nodesAvailable := make(map[string]*api.NodeInfo)
 	selector := labels.SelectorFromSet(labels.Set(map[string]string{"type": "virtual-kubelet"}))
 	for _, node := range ssn.Nodes {
+		klog.V(3).Infof("Iterating over node: %v", node.Node.Labels)
 		if selector.Matches(labels.Set(node.Node.Labels)) {
+			klog.V(3).Infof("I am inside the if statement")
 			node = addNodeProperty(node)
-			if node.Rack < 0 {
-				continue
-			}
+//			if node.Rack < 0 {
+//				continue
+//			}
 			nodes = append(nodes, node)
+			klog.V(3).Infof("Adding a node to the list: %v", node.Node.ObjectMeta.Name)
+			klog.V(3).Infof("Node millicpu: %v", node.Idle.MilliCPU)
+			klog.V(3).Infof("Node millimemory: %v", node.Idle.Memory)
+			klog.V(3).Infof("Node millimemory: %v", node.Idle.MaxTaskNum)
+			klog.V(3).Infof("-------------------")
 			if t.Resreq.LessEqual(node.Idle, api.Zero) {
 				nodesAvailable[node.Node.ObjectMeta.Name] = node
 			}
@@ -252,7 +260,7 @@ func (alloc *Action) Execute(ssn *framework.Session) {
 				output.Machines = append(output.Machines, node.ID)
 			}
 		}
-
+		klog.V(3).Infof("I am now going to enter recordDecision ...")
 		// Record scheduling decision in a json file
 		recordDecision(input,output,trace)
 
@@ -303,6 +311,7 @@ func (alloc *Action) Execute(ssn *framework.Session) {
 	}
 	if nothingScheduled { // if nothing scheduled, record empty scheduling decision
 		var output OutputT // empty
+		klog.V(3).Infof("Looks like nothing is scheduled but I am still going to enter recordDecisions ...")
 		recordDecision(input,output,trace)
 	}
 }
@@ -318,6 +327,7 @@ var prevOutput OutputT
 
 func recordDecision(input InputT, output OutputT, trace string) {
 	// Marshal policy input and output to json and write to file
+	klog.V(3).Infof("Now I am going to record decision ...")
 	var message Message
 	message.Input = input
 	if len(output.Machines)>0 {

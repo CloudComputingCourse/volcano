@@ -119,7 +119,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Release.Name }}-scheduler
-          image: {{.Values.basic.scheduler_image_name}}:{{.Values.basic.image_tag_version}}
+          image: sailimages/vc-sail-scheduler:8946e83763e2f8a50090509ced877071072422b6
           args:
             - --logtostderr
             - --scheduler-conf=/volcano.scheduler/{{base .Values.basic.scheduler_config_file}}
@@ -127,7 +127,7 @@ spec:
             - --enable-metrics=true
             - -v=3
             - 2>&1
-          imagePullPolicy: {{ .Values.basic.image_pull_policy }}
+          imagePullPolicy: Always
           volumeMounts:
             - name: scheduler-config
               mountPath: /volcano.scheduler
