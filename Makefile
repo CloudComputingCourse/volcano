@@ -89,7 +89,7 @@ image_bins: vc-scheduler vc-controller-manager vc-webhook-manager
 images:
 	for name in scheduler; do\
 		docker buildx build -t "${IMAGE_PREFIX}/vc-sail-$$name:8946e83763e2f8a50090509ced877071072422b7" . -f ./installer/dockerfile/$$name/Dockerfile --output=type=${BUILDX_OUTPUT_TYPE} --platform ${DOCKER_PLATFORMS}; \
-		minikube image push "${IMAGE_PREFIX}/vc-sail-$$name:8946e83763e2f8a50090509ced877071072422b7"; \
+#		minikube image push "${IMAGE_PREFIX}/vc-sail-$$name:8946e83763e2f8a50090509ced877071072422b7"; \
 	done
 
 generate-code:
