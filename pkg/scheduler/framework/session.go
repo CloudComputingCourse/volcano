@@ -343,8 +343,8 @@ func (ssn *Session) Allocate(task *api.TaskInfo, nodeInfo *api.NodeInfo) (err er
 	if err != nil {
 		return err
 	}
-
 	hostname := nodeInfo.Name
+
 	if err := ssn.cache.AllocateVolumes(task, hostname, podVolumes); err != nil {
 		return err
 	}
@@ -386,7 +386,6 @@ func (ssn *Session) Allocate(task *api.TaskInfo, nodeInfo *api.NodeInfo) (err er
 			hostname, ssn.UID)
 		return fmt.Errorf("failed to find node %s", hostname)
 	}
-
 	// Callbacks
 	for _, eh := range ssn.eventHandlers {
 		if eh.AllocateFunc != nil {
@@ -405,7 +404,8 @@ func (ssn *Session) Allocate(task *api.TaskInfo, nodeInfo *api.NodeInfo) (err er
 			}
 		}
 	} else {
-		ssn.cache.RevertVolumes(task, podVolumes)
+		fmt.Println("entering revert volumes through jobready")
+		//ssn.cache.RevertVolumes(task, podVolumes)
 	}
 
 	return nil

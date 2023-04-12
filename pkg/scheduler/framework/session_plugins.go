@@ -18,7 +18,6 @@ package framework
 
 import (
 	k8sframework "k8s.io/kubernetes/pkg/scheduler/framework"
-
 	"volcano.sh/apis/pkg/apis/scheduling"
 	"volcano.sh/volcano/pkg/controllers/job/helpers"
 	"volcano.sh/volcano/pkg/scheduler/api"
@@ -500,7 +499,7 @@ func (ssn *Session) ReservedNodes() {
 
 // JobOrderFn invoke joborder function of the plugins
 func (ssn *Session) JobOrderFn(l, r interface{}) bool {
-	for _, tier := range ssn.Tiers {
+/*	for _, tier := range ssn.Tiers {
 		for _, plugin := range tier.Plugins {
 			if !isEnabled(plugin.EnabledJobOrder) {
 				continue
@@ -514,7 +513,7 @@ func (ssn *Session) JobOrderFn(l, r interface{}) bool {
 			}
 		}
 	}
-
+*/
 	// If no job order funcs, order job by CreationTimestamp first, then by UID.
 	lv := l.(*api.JobInfo)
 	rv := r.(*api.JobInfo)
