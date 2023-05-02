@@ -19,6 +19,7 @@ package allocate
 import (
 	//"time"
 
+	"context"
 	"k8s.io/klog/v2"
 
 	//"volcano.sh/apis/pkg/apis/scheduling"
@@ -51,10 +52,10 @@ type JobT struct {
 }
 
 type InputT struct {
-	RackCap              []int    `json:"rack_cap"`
-	NumLargeMachineRacks int      `json:"numLargeMachineRacks"`
-	Queue                []JobT   `json:"queue"`
-	Machines             []int    `json:"machines"`
+	RackCap              []int  `json:"rack_cap"`
+	NumLargeMachineRacks int    `json:"numLargeMachineRacks"`
+	Queue                []JobT `json:"queue"`
+	Machines             []int  `json:"machines"`
 }
 
 type OutputT struct {
@@ -63,12 +64,11 @@ type OutputT struct {
 }
 
 type Message struct {
-	Input  InputT `json:"input"`
+	Input  InputT      `json:"input"`
 	Output interface{} `json:"output"`
 }
 
 /*****************   p3k8s specific strcuts above  ******************/
-
 
 type Action struct{}
 
@@ -174,6 +174,7 @@ func (alloc *Action) Execute(ssn *framework.Session) {
 	nothingScheduled := true
 	var input InputT
 
+	itCounter := 0
 	for { // repeat until no more jobs can be scheduled (one job per iteration)
 		// Prepare policy input for grader json
 		input = prepareInput(jobs, nodes, nodesAvailable)
@@ -226,7 +227,7 @@ func (alloc *Action) Execute(ssn *framework.Session) {
 						klog.Errorf("ERROR! Job %v partially allocated", job.Name)
 						break
 					} else {
-						// can contiue to the next task 
+						// can contiue to the next task
 						// not skipping the entire job, to detect partial allocations
 						continue
 					}
@@ -255,7 +256,7 @@ func (alloc *Action) Execute(ssn *framework.Session) {
 		}
 
 		// Record scheduling decision in a json file
-		recordDecision(input,output,trace)
+		recordDecision(input, output, trace)
 
 		if validAllocation {
 			// Allocate tasks
@@ -273,9 +274,24 @@ func (alloc *Action) Execute(ssn *framework.Session) {
 			}
 		}
 
+		fmt.Printf("Started printing all jobs in job list passed to the policy in iteration %v\n", itCounter)
+		for _, j := range jobs {
+			fmt.Printf("Printing job %v in jobs list and its annotations \n", j.Name)
+			for _, info := range j.Tasks {
+				p, e := ssn.KubeClient().CoreV1().Pods(j.Namespace).Get(context.TODO(), info.Pod.Name, metav1.GetOptions{})
+				if e != nil {
+					fmt.Printf("Error getting pod %v: %v\n", p.Name, e)
+				} else {
+					fmt.Printf("Printing annotations from pod %v: %v\n", p.Name, p.Annotations)
+				}
+			}
+		}
+		fmt.Printf("Finished printing all jobs in job list passed to the policy in iteration %v\n", itCounter)
+
 		// remove the allocated job from the list passed to the policy in the next loop iteration
 		// if allocation was not valid, the job will be considered again next time Execute() is called
 		jobs = append(jobs[:jobAllocatedIdx], jobs[jobAllocatedIdx+1:]...)
+		itCounter += 1
 
 		// if no more jobs or nodes, exit the loop
 		if len(jobs) == 0 {
@@ -304,12 +320,11 @@ func (alloc *Action) Execute(ssn *framework.Session) {
 	}
 	if nothingScheduled { // if nothing scheduled, record empty scheduling decision
 		var output OutputT // empty
-		recordDecision(input,output,trace)
+		recordDecision(input, output, trace)
 	}
 }
 
 func (alloc *Action) UnInitialize() {}
-
 
 /*********************** p3k8s specific functions *********************************/
 
@@ -321,20 +336,20 @@ func recordDecision(input InputT, output OutputT, trace string) {
 	// Marshal policy input and output to json and write to file
 	var message Message
 	message.Input = input
-	if len(output.Machines)>0 {
+	if len(output.Machines) > 0 {
 		sort.Ints(output.Machines)
 		message.Output = output
 	}
 	// save only if input is different than the previous one
-	if !reflect.DeepEqual(input,prevInput) || !reflect.DeepEqual(output,prevOutput) {
+	if !reflect.DeepEqual(input, prevInput) || !reflect.DeepEqual(output, prevOutput) {
 		jobsInfo := []int{}
-		for _,jq  := range(input.Queue) {
+		for _, jq := range input.Queue {
 			jobsInfo = append(jobsInfo, jq.JobID)
 		}
 		sort.Ints(jobsInfo)
 		nodesInfo := input.Machines
 		sort.Ints(nodesInfo)
-		if len(output.Machines)>0 {
+		if len(output.Machines) > 0 {
 			klog.Infof("Policy scheduled JobID=%v to %v (Input queue: %v, nodes: %v)",
 				output.JobID, output.Machines, jobsInfo, nodesInfo)
 		} else {
@@ -342,7 +357,7 @@ func recordDecision(input InputT, output OutputT, trace string) {
 				jobsInfo, nodesInfo)
 		}
 		b, _ := json.Marshal(message)
-		traceFile, _ := os.OpenFile(fmt.Sprintf("/tmp/trace-%s.json", trace), os.O_APPEND | os.O_CREATE | os.O_WRONLY, 0644)
+		traceFile, _ := os.OpenFile(fmt.Sprintf("/tmp/trace-%s.json", trace), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		traceFile.Write(append(b, ','))
 		traceFile.Close()
 	} else {
@@ -353,10 +368,9 @@ func recordDecision(input InputT, output OutputT, trace string) {
 	prevOutput = output
 }
 
-
 func addJobProperty(job *api.JobInfo) *api.JobInfo {
 	for _, task := range job.TaskStatusIndex[api.Pending] {
-//		jobID, _ := strconv.ParseInt(job.Name[3 :], 10, 64)
+		//		jobID, _ := strconv.ParseInt(job.Name[3 :], 10, 64)
 		jobID, _ := strconv.ParseInt(strings.Split(job.Name, "-")[1], 10, 64)
 		job.ID = int(jobID)
 		job.Trace = task.Pod.ObjectMeta.Labels["trace"]
@@ -377,7 +391,7 @@ func addJobProperty(job *api.JobInfo) *api.JobInfo {
 }
 
 func addNodeProperty(node *api.NodeInfo) *api.NodeInfo {
-	nodeID, _ := strconv.ParseInt(node.Node.ObjectMeta.Name[3 :], 10, 64)
+	nodeID, _ := strconv.ParseInt(node.Node.ObjectMeta.Name[3:], 10, 64)
 	node.ID = int(nodeID)
 	if rack, found := node.Node.ObjectMeta.Labels["Rack"]; found {
 		rackID, _ := strconv.ParseInt(rack, 10, 64)
@@ -419,7 +433,7 @@ func prepareInput(jobs []*api.JobInfo, nodes []*api.NodeInfo, nodesAvailable map
 			}
 		}
 	}
-	for rackID := 1; rackID <= len(rackCap); rackID ++ {
+	for rackID := 1; rackID <= len(rackCap); rackID++ {
 		input.RackCap = append(input.RackCap, rackCap[rackID])
 	}
 
