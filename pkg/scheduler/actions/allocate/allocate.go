@@ -19,7 +19,6 @@ package allocate
 import (
 	//"time"
 
-//	"context"
 	"k8s.io/klog/v2"
 
 	//"volcano.sh/apis/pkg/apis/scheduling"
@@ -174,7 +173,6 @@ func (alloc *Action) Execute(ssn *framework.Session) {
 	nothingScheduled := true
 	var input InputT
 
-//	itCounter := 0
 	for { // repeat until no more jobs can be scheduled (one job per iteration)
 		// Prepare policy input for grader json
 		input = prepareInput(jobs, nodes, nodesAvailable)
@@ -275,15 +273,22 @@ func (alloc *Action) Execute(ssn *framework.Session) {
 
 		}
 
-		//podList, e := ssn.KubeClient().CoreV1().Pods("default").List(context.TODO(), metav1.ListOptions{})
-		//if e != nil {
-		//	fmt.Printf("Error listing %v\n", e)
-		//}
+//		for _, j := range jobs {
+//			fmt.Printf("Printing job %v in jobs list and its annotations \n", j.Name)
+//			for _, info := range j.Tasks {
+//				p, e := ssn.KubeClient().CoreV1().Pods(j.Namespace).Get(context.TODO(), info.Pod.Name, metav1.GetOptions{})
+//				if e != nil {
+//					fmt.Printf("Error getting pod %v: %v\n", p.Name, e)
+//				} else {
+//					fmt.Printf("Printing annotations from pod %v: %v\n", p.Name, p.Annotations)
+//				}
+//			}
+//		}
+//		fmt.Printf("Finished printing all jobs in job list passed to the policy in iteration %v\n", itCounter)
 
 		// remove the allocated job from the list passed to the policy in the next loop iteration
 		// if allocation was not valid, the job will be considered again next time Execute() is called
 		jobs = append(jobs[:jobAllocatedIdx], jobs[jobAllocatedIdx+1:]...)
-		//itCounter += 1
 
 		// if no more jobs or nodes, exit the loop
 		if len(jobs) == 0 {
