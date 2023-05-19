@@ -404,7 +404,7 @@ func (ssn *Session) Allocate(task *api.TaskInfo, nodeInfo *api.NodeInfo) (err er
 			}
 		}
 	} else {
-		fmt.Println("entering revert volumes through jobready")
+		fmt.Printf("entering revert volumes through jobready with task %v\n", task.Name)
 		//ssn.cache.RevertVolumes(task, podVolumes)
 	}
 

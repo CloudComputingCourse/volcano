@@ -2,7 +2,6 @@ package framework
 
 import (
 	"k8s.io/klog/v2"
-
 	"volcano.sh/volcano/pkg/scheduler/api"
 )
 
