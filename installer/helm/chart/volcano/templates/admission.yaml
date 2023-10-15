@@ -152,7 +152,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: main
-          image: {{.Values.basic.admission_image_name}}:{{.Values.basic.image_tag_version}}
+          image: {{.Values.basic.admission_image_name}}:v2
           imagePullPolicy: {{ .Values.basic.image_pull_policy }}
           command: ["./gen-admission-secret.sh", "--service", "{{ .Release.Name }}-admission-service", "--namespace",
                     "{{ .Release.Namespace }}", "--secret", "{{.Values.basic.admission_secret_name}}"]
