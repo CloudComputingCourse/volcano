@@ -102,7 +102,7 @@ spec:
       {{- end }}
       containers:
           - name: {{ .Release.Name }}-controllers
-            image: {{.Values.basic.controller_image_name}}:{{.Values.basic.image_tag_version}}
+            image: {{.Values.basic.controller_image_name}}:v2
             args:
               - --logtostderr
               - --enable-healthz=true
